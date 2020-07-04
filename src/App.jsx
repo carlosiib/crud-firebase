@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { firebase } from "./firebase";
+import { firestore } from "firebase";
 
 function App() {
   //DB state
@@ -61,6 +62,20 @@ function App() {
     console.log(tarea);
   };
 
+  const eliminarTarea = async (id) => {
+    try {
+      const db = firebase.firestore();
+      await db.collection("tareas").doc(id).delete();
+
+      const arrayFiltrado = tareas.filter(
+        (item) => item.id !== id
+      );
+
+      setTareas(arrayFiltrado);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="container mt-3">
       <div className="row">
@@ -73,6 +88,16 @@ function App() {
                 key={item.id}
               >
                 {item.name}
+
+                <button
+                  className="btn btn-danger btn-sm float-right"
+                  onClick={() => eliminarTarea(item.id)}
+                >
+                  Eliminar
+                </button>
+                <button className="btn btn-warning btn-sm float-right mr-2">
+                  Editar
+                </button>
               </li>
             ))}
           </ul>
