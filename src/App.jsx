@@ -85,8 +85,35 @@ function App() {
     setId(item.id);
   };
 
+  //form update handler
   const editar = async (e) => {
     e.preventDefault();
+    if (!tarea.trim()) {
+      console.log("Tarea vacia");
+      return;
+    }
+    try {
+      //updating the task in firstore
+      const db = firebase.firestore();
+      await db.collection("tareas").doc(id).update({
+        name: tarea,
+      });
+      const arrayEditado = tareas.map((item) =>
+        item.id !== id
+          ? { id: item.id, fecha: item.fecha, name: tarea }
+          : item
+      );
+
+      //updating form UI
+      setTareas(arrayEditado);
+
+      //cleaning the form
+      setModoEdicion(!modoEdicion);
+      setTarea("");
+      setId("");
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="container mt-3">
