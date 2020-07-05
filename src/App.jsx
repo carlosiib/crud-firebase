@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { firebase } from "./firebase";
-import { firestore } from "firebase";
+import { firebase, firestore } from "./firebase";
 
 function App() {
   //DB state
@@ -80,7 +79,8 @@ function App() {
   };
 
   const activarEdicion = (item) => {
-    setModoEdicion(!modoEdicion);
+    setModoEdicion(true);
+    //ligando tarea para ponerla en el campo editar
     setTarea(item.name);
     setId(item.id);
   };
@@ -92,23 +92,30 @@ function App() {
       console.log("Tarea vacia");
       return;
     }
+
     try {
       //updating the task in firstore
       const db = firebase.firestore();
       await db.collection("tareas").doc(id).update({
         name: tarea,
       });
-      const arrayEditado = tareas.map((item) =>
-        item.id !== id
-          ? { id: item.id, fecha: item.fecha, name: tarea }
-          : item
+      const arrayEditado = tareas.map(
+        (item) =>
+          item.id === id
+            ? {
+                id: item.id,
+                fecha: item.fecha,
+                name: tarea,
+              }
+            : item
+        /*item => retornamos el item sin modificacion*/
       );
 
       //updating form UI
       setTareas(arrayEditado);
 
       //cleaning the form
-      setModoEdicion(!modoEdicion);
+      setModoEdicion(false);
       setTarea("");
       setId("");
     } catch (error) {
@@ -117,7 +124,9 @@ function App() {
   };
   return (
     <div className="container mt-3">
-      <div className="row">
+      <h1 className="text-center">CRUD Firestore</h1>
+      <hr className="mb-3" />
+      <div className="row ">
         <div className="col-md-6">
           <ul className="list-group">
             {tareas.map((item) => (
