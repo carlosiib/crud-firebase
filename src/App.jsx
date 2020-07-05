@@ -8,6 +8,8 @@ function App() {
   const [tareas, setTareas] = useState([]);
   //form state
   const [tarea, setTarea] = useState("");
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [id, setId] = useState("");
 
   useEffect(() => {
     const obtenerDatos = async () => {
@@ -76,6 +78,16 @@ function App() {
       console.log(error);
     }
   };
+
+  const activarEdicion = (item) => {
+    setModoEdicion(!modoEdicion);
+    setTarea(item.name);
+    setId(item.id);
+  };
+
+  const editar = async (e) => {
+    e.preventDefault();
+  };
   return (
     <div className="container mt-3">
       <div className="row">
@@ -95,7 +107,10 @@ function App() {
                 >
                   Eliminar
                 </button>
-                <button className="btn btn-warning btn-sm float-right mr-2">
+                <button
+                  className="btn btn-warning btn-sm float-right mr-2"
+                  onClick={() => activarEdicion(item)}
+                >
                   Editar
                 </button>
               </li>
@@ -103,8 +118,10 @@ function App() {
           </ul>
         </div>
         <div className="col-md-6">
-          <h3>Formulario</h3>
-          <form onSubmit={agregar}>
+          <h3>
+            {modoEdicion ? "Editar Tarea" : "Agregar Tarea"}
+          </h3>
+          <form onSubmit={modoEdicion ? editar : agregar}>
             <input
               type="text"
               placeholder="Ingrese Tarea"
@@ -113,10 +130,14 @@ function App() {
               value={tarea}
             />
             <button
-              className="btn btn-dark btn-block"
+              className={
+                modoEdicion
+                  ? "btn btn-warning btn-block"
+                  : "btn btn-dark btn-block"
+              }
               type="submit"
             >
-              Agregar
+              {modoEdicion ? "Editar" : "Agregar"}
             </button>
           </form>
         </div>
